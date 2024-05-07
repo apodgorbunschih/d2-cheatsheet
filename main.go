@@ -22,7 +22,7 @@ func emptyCanvas() {
 	data := []byte(ast)
 
 	// Save it to a d2 file
-	_ = os.WriteFile(filepath.Join("emptyCanvas.d2"), data, 0600)
+	_ = os.WriteFile(filepath.Join("results/emptyCanvas.d2"), data, 0600)
 }
 
 func twoNodes() {
