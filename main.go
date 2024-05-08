@@ -5,6 +5,7 @@ import (
 	"oss.terrastruct.com/d2/d2compiler"
 	"oss.terrastruct.com/d2/d2format"
 	"oss.terrastruct.com/d2/d2oracle"
+	"oss.terrastruct.com/util-go/go2"
 	"path/filepath"
 	"strings"
 )
@@ -14,6 +15,7 @@ func main() {
 	twoNodes()
 	threeNodes()
 	threeNodesGroup()
+	cloudsExample()
 }
 
 func emptyCanvas() {
@@ -85,4 +87,37 @@ func threeNodesGroup() {
 
 	// Save it to a d2 file
 	_ = os.WriteFile(filepath.Join("results/threeNodesGroup.d2"), data, 0600)
+}
+
+func cloudsExample() {
+	// Create an empty graph/canvas
+	graph, _, _ := d2compiler.Compile("", strings.NewReader(""), nil)
+
+	// Create Groups
+	graph, _, _ = d2oracle.Create(graph, nil, "clouds")
+	graph, _, _ = d2oracle.Create(graph, nil, "clouds.aws")
+	graph, _, _ = d2oracle.Create(graph, nil, "clouds.gcloud")
+
+	graph, _, _ = d2oracle.Create(graph, nil, "clouds.aws.load_balancer -> clouds.aws.api")
+	graph, _, _ = d2oracle.Create(graph, nil, "clouds.aws.api -> clouds.aws.db")
+
+	graph, _, _ = d2oracle.Create(graph, nil, "clouds.gcloud.auth -> clouds.gcloud.db")
+
+	graph, _, _ = d2oracle.Create(graph, nil, "clouds.gcloud -> clouds.aws")
+
+	graph, _, _ = d2oracle.Create(graph, nil, "users-> clouds.aws.load_balancer")
+	graph, _, _ = d2oracle.Create(graph, nil, "users-> clouds.gcloud.auth")
+
+	graph, _, _ = d2oracle.Create(graph, nil, "ci.deploy-> clouds")
+
+	// Add labels
+	graph, _ = d2oracle.Set(graph, nil, "clouds.aws.label", nil, go2.Pointer("AWS"))
+	graph, _ = d2oracle.Set(graph, nil, "clouds.gcloud.label", nil, go2.Pointer("Gcloud"))
+
+	// Get the Abstract Syntax Tree
+	ast := d2format.Format(graph.AST)
+	data := []byte(ast)
+
+	// Save it to a d2 file
+	_ = os.WriteFile(filepath.Join("results/cloudsExample.d2"), data, 0600)
 }

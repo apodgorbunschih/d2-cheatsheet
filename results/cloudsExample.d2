@@ -1,0 +1,13 @@
+clouds: {
+  aws: AWS {
+    load_balancer -> api
+    api -> db
+  }
+  gcloud: Gcloud {
+    auth -> db
+  }
+  gcloud -> aws
+}
+users -> clouds.aws.load_balancer
+users -> clouds.gcloud.auth
+ci.deploy -> clouds
