@@ -17,6 +17,7 @@ func main() {
 	threeNodesGroup()
 	cloudsExample()
 	shapes()
+	textAndCode()
 }
 
 func emptyCanvas() {
@@ -143,4 +144,37 @@ func shapes() {
 
 	// Save it to a d2 file
 	_ = os.WriteFile(filepath.Join("results/shapes.d2"), data, 0600)
+}
+
+func textAndCode() {
+	graph, _, _ := d2compiler.Compile("", strings.NewReader(""), nil)
+
+	graph, _, _ = d2oracle.Create(graph, nil, "A")
+	text := `
+  # I can do headers
+  - lists
+  - lists
+
+  And other normal markdown stuff
+`
+	graph, _ = d2oracle.Set(graph, nil, "A.explanation", go2.Pointer("md"), &text)
+
+	graph, _, _ = d2oracle.Create(graph, nil, "B")
+	code := `
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("hello world")
+}
+`
+	graph, _ = d2oracle.Set(graph, nil, "B.explanation", go2.Pointer("go"), &code)
+
+	// Get the Abstract Syntax Tree
+	ast := d2format.Format(graph.AST)
+	data := []byte(ast)
+
+	// Save it to a d2 file
+	_ = os.WriteFile(filepath.Join("results/textAndCode.d2"), data, 0600)
 }
