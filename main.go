@@ -16,6 +16,7 @@ func main() {
 	threeNodes()
 	threeNodesGroup()
 	cloudsExample()
+	shapes()
 }
 
 func emptyCanvas() {
@@ -120,4 +121,26 @@ func cloudsExample() {
 
 	// Save it to a d2 file
 	_ = os.WriteFile(filepath.Join("results/cloudsExample.d2"), data, 0600)
+}
+
+func shapes() {
+	// Create an empty graph/canvas
+	graph, _, _ := d2compiler.Compile("", strings.NewReader(""), nil)
+
+	// Create Nodes and shapes
+	graph, _, _ = d2oracle.Create(graph, nil, "clouds")
+	graph, _ = d2oracle.Set(graph, nil, "clouds.shape", nil, go2.Pointer("cloud"))
+
+	graph, _, _ = d2oracle.Create(graph, nil, "diamond")
+	graph, _ = d2oracle.Set(graph, nil, "diamond.shape", nil, go2.Pointer("diamond"))
+
+	graph, _, _ = d2oracle.Create(graph, nil, "circle")
+	graph, _ = d2oracle.Set(graph, nil, "circle.shape", nil, go2.Pointer("circle"))
+
+	// Get the Abstract Syntax Tree
+	ast := d2format.Format(graph.AST)
+	data := []byte(ast)
+
+	// Save it to a d2 file
+	_ = os.WriteFile(filepath.Join("results/shapes.d2"), data, 0600)
 }
